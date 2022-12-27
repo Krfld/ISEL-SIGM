@@ -1,0 +1,115 @@
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_ta
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+-- Eliminar Dados (anteriores)
+--=============================
+DELETE FROM efeito_obj;
+DELETE FROM gps_ponto;
+DELETE FROM rio;
+DELETE FROM terreno;
+DELETE FROM tipo_terreno;
+---------------------------------
+
+
+----------------------------
+-- Povoar Dados
+----------------------------
+-- TIPO_TERRENO
+----------------------------
+INSERT INTO tipo_terreno( id_tipo_terreno )
+VALUES('Rio')
+;
+
+INSERT INTO tipo_terreno( id_tipo_terreno )
+VALUES('Floresta')
+;
+
+INSERT INTO tipo_terreno( id_tipo_terreno )
+VALUES('Deserto')
+;
+
+INSERT INTO tipo_terreno( id_tipo_terreno )
+VALUES('Tundra')
+;
+
+INSERT INTO tipo_terreno( id_tipo_terreno )
+VALUES('Lago')
+;
+
+
+----------------------------
+-- RIO
+----------------------------
+INSERT INTO rio( id_rio, id_tipo_terreno, nivel, g_rio )
+VALUES
+(1, 'Rio', 5, ST_GeomFromText('LINESTRING(50 200, 125 199, 163 169, 175 124, 208 112, 270 100)')),
+(2, 'Rio', 5, ST_GeomFromText('LINESTRING(60 50, 119 70, 125 100, 150 115, 176 94, 181 50, 170 26)'))
+;
+
+
+----------------------------
+-- TERRENO
+----------------------------
+INSERT INTO terreno( id_terreno, id_tipo_terreno, nivel, g_terreno )
+VALUES
+(1, 'Floresta', 0, ST_GeomFromText('POLYGON((25 180, 30 200, 50 215, 90 175, 82 145, 30 125, 25 180))')),
+(2, 'Deserto', 1, ST_GeomFromText('POLYGON((50 202, 75 215, 155 210, 178 176, 175 130, 110 135, 60 155, 50 202))')),
+(3, 'Tundra', 0, ST_GeomFromText('POLYGON((155 161, 225 178, 270 175, 271 125, 170 51, 150 75, 132 120, 155 161))')),
+(4, 'Floresta', 1, ST_GeomFromText('POLYGON((179 100, 219 120, 255 119, 285 108, 284 59, 259 25, 218 17, 178 49, 179 100))')),
+(5, 'Deserto', 0, ST_GeomFromText('POLYGON((41 50, 84 82, 160 88, 202 62, 203 29, 161 12, 53 25, 41 50))')),
+(6, 'Tundra', 2, ST_GeomFromText('POLYGON((50 75, 50 128, 70 163, 165 150, 170 101, 120 66, 50 75))')),
+(7, 'Lago', 3, ST_GeomFromText('POLYGON((68 113, 73 129, 87 134, 100 126, 113 115, 108 83, 80 89, 68 113))')),
+(8, 'Floresta', 4, ST_GeomFromText('POLYGON((79 108, 76 118, 87 124, 93 116, 90 105, 79 108))'))
+;
+
+
+
+----------------------------
+-- GPS_PONTO
+----------------------------
+-- INSERT INTO gps_ponto( 
+--
+--;
+
+
+
+
+
+----------------------------
+-- GPS_PONTO
+----------------------------
+--INSERT INTO gps_ponto VALUES (1, 1,  ST_MakePoint( 0, 0 ) );
+
+
+
+
+DROP TABLE IF EXISTS terrenos_rios;
+
+CREATE TABLE terrenos_rios (
+	id_tipo_terreno varchar,
+	nivel int,
+	constraint fk_id_tipo_terreno foreign key (id_tipo_terreno) references tipo_terreno(id_tipo_terreno)
+);
+SELECT AddGeometryColumn( '', 'terrenos_rios', 'g_geo', 0, 'POLYGON', 2 );
+
+INSERT INTO terrenos_rios ( id_tipo_terreno, nivel, g_geo )
+SELECT t.id_tipo_terreno, t.nivel, t.g_terreno as g_geo
+FROM terreno t
+ORDER BY t.nivel
+;
+
+INSERT INTO terrenos_rios ( id_tipo_terreno, nivel, g_geo )
+SELECT r.id_tipo_terreno, r.nivel, ST_Buffer(r.g_rio, 5) as g_geo
+FROM rio r
+;

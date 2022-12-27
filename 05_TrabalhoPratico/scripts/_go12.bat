@@ -1,0 +1,1 @@
+_go 12_script_POVOAR_OBJETO.txt

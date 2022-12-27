@@ -1,0 +1,32 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_gps
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+----------------------------
+-- TERRENO
+-- (actualizar os poligonos)
+----------------------------
+UPDATE TERRENO
+SET g_terreno = (SELECT g_poligono
+FROM V_POLIGONO AS VP
+WHERE VP.id_terreno = TERRENO.id_terreno)
+;
+
+
+
+

@@ -1,0 +1,1 @@
+_go 10_script_POVOAR_TERRENO.txt

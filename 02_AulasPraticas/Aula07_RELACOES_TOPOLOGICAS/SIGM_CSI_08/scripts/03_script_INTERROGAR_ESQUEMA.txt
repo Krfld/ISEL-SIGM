@@ -1,0 +1,110 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_top
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+-- mais informação sobre "client_encoding" em:
+-- http://www.postgresql.org/docs/8.1/static/multibyte.html
+\encoding WIN1250;
+
+
+--=================================
+-- Interrogar com Matriz Topologica
+--=================================
+
+--4a
+SELECT estrada.id, estrada.geo, ST_Relate(estrada.geo, regiao.geo)
+FROM estrada, regiao
+WHERE ST_Relate(estrada.geo, regiao.geo, 'FTFF*F***')
+;
+
+--4b
+SELECT camara.id
+FROM camara, regiao
+WHERE ST_Relate(camara.geo, regiao.geo, 'F*F******')
+;
+
+--4c
+DELETE FROM camara;
+INSERT INTO camara ( id, geo )
+VALUES
+(1, ST_GeomFromText('POINT(10 10)')),
+(2, ST_GeomFromText('POINT(8 30)')),
+(3, ST_GeomFromText('POINT(10 25)'))
+;
+
+--4d
+SELECT camara.id, estrada.id
+FROM camara, (
+	SELECT estrada.id, estrada.geo, ST_Relate(estrada.geo, regiao.geo)
+	FROM estrada, regiao
+	WHERE ST_Relate(estrada.geo, regiao.geo, 'FTFF*F***')
+) as estrada
+WHERE ST_Relate(camara.geo, estrada.geo, '**F******')
+;
+
+--4e
+SELECT a.id as contida, b.id as contem
+FROM estrada a, estrada b
+WHERE ST_Relate(a.geo, b.geo, 'TFFT*F***') and a.id != b.id
+;
+
+--4f
+SELECT estrada.id, estrada.geo
+FROM estrada, regiao
+WHERE ST_Relate(estrada.geo, regiao.geo, 'T********')
+;
+
+
+
+--5a
+SELECT camara.id as id_0d, estrada.id as id_1d, ST_Relate(camara.geo, estrada.geo)
+FROM camara, estrada
+;
+
+--5b
+SELECT camara.id as id_0d, estrada.id as id_1d 
+FROM camara, estrada
+WHERE ST_Relate(camara.geo, estrada.geo, '***FFF102')
+;
+
+--5c
+SELECT a.id as id_a, b.id as id_b, ST_Relate(a.geo, b.geo)
+FROM estrada a, estrada b
+;
+
+--5d
+SELECT estrada.id as id_1d, regiao.id as id_2d, ST_Relate(estrada.geo, regiao.geo)
+FROM estrada, regiao
+;
+
+--5e
+SELECT estrada.id as id_1d, regiao.id as id_2d
+FROM estrada, regiao
+WHERE ST_Relate(estrada.geo, regiao.geo, '******212')
+;
+
+
+--5g
+-- Quais são as estradas que a camara 1 está a vigiar às 16 horas
+SELECT estrada.id
+FROM (
+	SELECT s.id_regiao
+	FROM supervisiona as s
+	WHERE s.desde_hora < 16 and s.ate_hora > 16 and s.id_camara = 1
+) as reg, regiao, estrada
+WHERE reg.id_regiao = regiao.id and ST_Relate(regiao.geo, estrada.geo, 'T********')
+;

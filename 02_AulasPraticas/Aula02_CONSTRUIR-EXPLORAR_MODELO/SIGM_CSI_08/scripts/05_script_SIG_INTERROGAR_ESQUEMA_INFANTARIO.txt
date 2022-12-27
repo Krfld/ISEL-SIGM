@@ -1,0 +1,86 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+-- mais informação sobre "client_encoding" em:
+-- http://www.postgresql.org/docs/9.4/static/multibyte.html
+\encoding WIN1250
+;
+
+
+
+
+--===================
+-- Interrogar CLIENTE
+--===================
+
+-- Ponto geografico de cada cliente
+
+SELECT codigo, ST_AsText(ponto) as ponto FROM cliente
+;
+
+
+-- cada uma das coordenadas (ordenadas e abcissa) do ponto geográfico de cada cliente
+
+SELECT codigo, ST_X(ponto) as x, ST_Y(ponto) as y FROM cliente
+;
+
+
+
+
+--=====================
+-- Interrogar FREGUESIA
+--=====================
+
+-- Espaço geografico delimitado por cada freguesia e Área ocupada por cada freguesia
+
+SELECT nome, ST_AsText(regiao), ST_Area(regiao) as area FROM freguesia
+;
+
+
+
+
+
+--==================================
+-- Interrogar INFANTARIO e FREGUESIA
+--==================================
+
+-- Infantários (nome e geometria) de cada freguesia (nome e geometria)
+-- considerando apenas operações espaciais
+
+SELECT i.nome, ST_AsText(i.ponto), f.nome, ST_AsText(f.regiao)
+FROM infantario as i, freguesia as f
+WHERE ST_Intersects(i.ponto, f.regiao)
+;
+
+
+-- Distância de cada cliente a cada infantário indicando o seu nome próprio e de família
+
+SELECT c.nome_proprio, c.nome_familia, i.nome, ST_Distance(c.ponto, i.ponto) as distancia
+FROM cliente as c, infantario as i
+;
+
+
+-- nome do infantário e num único campo o nome próprio e de família dos clientes
+-- que vivem a uma distância superior a 20 (unidades) de algum infantário
+
+SELECT i.nome, CONCAT(c.nome_proprio, ' ', c.nome_familia)
+FROM cliente as c, infantario as i
+WHERE ST_Distance(c.ponto, i.ponto) > 20
+;

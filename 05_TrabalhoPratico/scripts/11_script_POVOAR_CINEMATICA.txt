@@ -1,0 +1,23 @@
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_ta
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+DELETE FROM efeito_obj;
+DELETE FROM objecto_movel;
+DELETE FROM cinematica_hist;
+DELETE FROM cinematica;
+
+INSERT INTO cinematica ( id, orientacao, velocidade, aceleracao, g_posicao )
+VALUES
+(1, 0, ((-1, 1), 0), ((0, 0), 0), ST_GeomFromText('POINT(170 30)')),
+(2, 0, ((-1, 1), 0), ((0, 0), 0), ST_GeomFromText('POINT(230 70)'))
+;

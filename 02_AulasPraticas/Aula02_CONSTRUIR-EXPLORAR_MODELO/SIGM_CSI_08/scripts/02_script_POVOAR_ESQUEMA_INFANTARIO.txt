@@ -1,0 +1,53 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+-- NOTA: completar em <XX>
+--==========================
+
+
+
+
+-- Cliente
+--=============================
+INSERT INTO cliente( CODIGO, BI, NOME_PROPRIO, NOME_FAMILIA )
+VALUES
+( 15, 83838383, 'Joana', 'Vilhena' ),
+( 2, 11111111, 'Pedro', 'Silva' ),
+( 333, 55555555, 'Miguel', 'Mendes' )
+;
+
+
+-- Infantário
+--=============================
+INSERT INTO infantario( NOME )
+VALUES
+( 'Fraldas' ),
+( 'Ursinho' ) 
+;
+
+
+-- Filho
+--=============================
+INSERT INTO filho( CODIGO_CLIENTE, NOME_PROPRIO, DATA_NASCIMENTO )
+VALUES
+( 15 , 'Rodrigo', TO_DATE('21/05/2000', 'DD/MM/YYYY') ),
+( 15 , 'Miguel', TO_DATE('14/01/2000', 'DD/MM/YYYY') ),
+( 2 , 'Pedro', TO_DATE('28/06/2000', 'DD/MM/YYYY') ),
+( 333, 'Afosno', TO_DATE('29/02/2000', 'DD/MM/YYYY') )
+;
+
+

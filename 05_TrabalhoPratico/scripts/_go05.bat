@@ -1,0 +1,1 @@
+_go 05_script_CRIAR_MODELO_PERSEGUICAO.txt

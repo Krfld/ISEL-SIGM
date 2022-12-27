@@ -1,0 +1,43 @@
+--#############
+--# Paulo Trigo
+--# OCT.2016
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+--___________________________________________________________
+-- \connect (or \c) [ dbname [ username ] [ host ] [ port ] ]
+-- (cf. postgresql-9.4-A4.pdf)
+--___________________________________________________________
+\connect :dataBase :userName
+;
+--==========================
+-- NOTA: completar em <XX>
+--==========================
+
+
+
+
+----------------------------------------------
+-- Criar Esquemas de Relacao
+-- (que derivem de Entidades e de Associacoes)
+----------------------------------------------
+
+-- Esquema de Relacao cliente
+CREATE TABLE cliente ( CODIGO int PRIMARY KEY, BI int, NOME_PROPRIO varchar(20), NOME_FAMILIA varchar(20) )
+
+
+;
+-- Esquema de Relacao filho
+CREATE TABLE filho ( NOME_PROPRIO varchar(20), DATA_NASCIMENTO DATE, CODIGO_CLIENTE int, CONSTRAINT FK_CODIGO_CLIENTE FOREIGN KEY(CODIGO_CLIENTE) REFERENCES cliente(CODIGO) )
+
+
+;
+-- Esquema de Relacao infantario
+CREATE TABLE infantario ( NOME varchar(20) )
+;
+

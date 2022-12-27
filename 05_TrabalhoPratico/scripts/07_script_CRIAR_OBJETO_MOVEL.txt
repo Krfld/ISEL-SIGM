@@ -1,0 +1,39 @@
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_ta
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+DROP TABLE IF EXISTS efeito_obj;
+DROP TABLE IF EXISTS objecto_movel;
+
+
+--__________________________________________________________________________
+-- Tabela com um qualquer objecto geometrico que se desloca com a cinematica
+--__________________________________________________________________________
+CREATE TABLE objecto_movel(
+	id int primary key,
+	nome varchar,
+	id_cinematica int,
+	constraint fk1 FOREIGN KEY (id_cinematica) references cinematica(id)
+);
+SELECT AddGeometryColumn( '', 'objecto_movel', 'g_geo', 0, 'POLYGON', 2 );
+--==========================================================================
+
+
+CREATE TABLE efeito_obj (
+	id_objeto int,
+	id_tipo_terreno varchar,
+	efeito real,
+	constraint pk_vel_obj primary key (id_objeto, id_tipo_terreno),
+	constraint fk_id_objeto foreign key (id_objeto) references objecto_movel(id),
+	constraint fk_id_tipo_terreno foreign key (id_tipo_terreno) references tipo_terreno(id_tipo_terreno)
+);

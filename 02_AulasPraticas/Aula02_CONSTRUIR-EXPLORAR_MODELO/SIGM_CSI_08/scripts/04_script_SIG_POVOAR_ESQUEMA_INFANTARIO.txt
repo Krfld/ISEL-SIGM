@@ -1,0 +1,86 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+
+--================
+-- Actualizar cliente
+--================
+
+UPDATE cliente
+SET ponto = ST_GeomFromText('POINT(10 20)')
+WHERE CODIGO = 15
+;
+
+
+UPDATE cliente
+SET ponto = ST_GeomFromText('POINT(30 20)')
+WHERE CODIGO = 2
+;
+
+
+UPDATE cliente
+SET ponto = ST_GeomFromText('POINT(30 40)')
+WHERE CODIGO = 333
+;
+
+
+
+
+--================
+-- Actualizar infantario
+--================
+
+UPDATE infantario
+SET ponto = ST_GeomFromText('POINT(40 10)')
+WHERE NOME = 'Fraldas'
+;
+
+
+UPDATE infantario
+SET ponto = ST_GeomFromText('POINT(20 30)')
+WHERE NOME = 'Ursinho'
+;
+
+
+
+
+--============
+-- Povoar freguesia
+--============
+
+DELETE FROM freguesia
+;
+
+
+INSERT INTO freguesia( NOME, REGIAO )
+VALUES ( 'Lumiar',  ST_GeomFromText('POLYGON((10.00 10.00, 10.00 40.00, 20.00
+30.00, 10.00 10.00))') )
+;
+
+
+UPDATE freguesia
+SET REGIAO = ST_GeomFromText('POLYGON((9.00 9.00, 10.00 40.00, 25.00 30.00,
+15.00 15.00, 9.00 9.00))')
+WHERE NOME = 'Lumiar'
+;
+
+
+

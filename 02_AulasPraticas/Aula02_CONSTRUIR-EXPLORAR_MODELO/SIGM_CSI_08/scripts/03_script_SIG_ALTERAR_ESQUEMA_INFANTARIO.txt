@@ -1,0 +1,60 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+-- NOTA: completar em <XX>
+--==========================
+
+
+
+
+----------------------------------------------
+-- Criar Esquemas de Relacao
+-- (que derivem de Entidades e de Associacoes)
+----------------------------------------------
+
+-- Esquema de Relacao freguesia
+CREATE TABLE freguesia ( NOME varchar(20) PRIMARY KEY )
+;
+
+
+
+
+-------------------------------
+-- Criar os Atributos Espaciais
+-------------------------------
+
+-- freguesia
+--=============================
+-- regiao
+SELECT AddGeometryColumn('', 'freguesia', 'regiao', 0, 'POLYGON', 2);
+;
+
+
+-- cliente
+--=============================
+-- ponto
+SELECT AddGeometryColumn('', 'cliente', 'ponto', 0, 'POINT', 2);
+;
+
+
+-- infantario
+--=============================
+-- ponto
+SELECT AddGeometryColumn('', 'infantario', 'ponto', 0, 'POINT', 2);
+;
+
+

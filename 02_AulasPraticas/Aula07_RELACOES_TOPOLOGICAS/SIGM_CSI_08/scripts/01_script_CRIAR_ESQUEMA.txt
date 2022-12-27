@@ -1,0 +1,54 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_top
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+DROP TABLE IF EXISTS supervisiona;
+DROP TABLE IF EXISTS camara;
+DROP TABLE IF EXISTS estrada;
+DROP TABLE IF EXISTS regiao;
+
+--------------------------------
+-- Criar o Esquema Relacional
+--------------------------------
+
+CREATE TABLE camara (
+	id int primary key
+);
+SELECT AddGeometryColumn( '', 'camara', 'geo', 0, 'POINT', 2 );
+
+
+CREATE TABLE estrada (
+	id int primary key
+);
+SELECT AddGeometryColumn( '', 'estrada', 'geo', 0, 'LINESTRING', 2 );
+
+
+CREATE TABLE regiao (
+	id int primary key
+);
+SELECT AddGeometryColumn( '', 'regiao', 'geo', 0, 'POLYGON', 2 );
+
+--3b
+CREATE TABLE supervisiona (
+	id int primary key,
+	desde_hora int,
+	ate_hora int,
+	id_camara int,
+	id_regiao int,
+	constraint fk_id_camara foreign key (id_camara) references camara(id),
+	constraint fk_id_regiao foreign key (id_regiao) references regiao(id)
+);

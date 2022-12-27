@@ -1,0 +1,58 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+-- mais informação sobre "client_encoding" em:
+-- http://www.postgresql.org/docs/9.4/static/multibyte.html
+\encoding WIN1250
+;
+
+-- select para mostrar os infantarios mais proximos a cada cliente
+
+SELECT d.codigo, i.nome, d.distancia
+FROM
+( 
+	SELECT c.codigo, min(ST_Distance(c.ponto, i.ponto)) as distancia
+	FROM cliente as c, infantario as i
+	GROUP BY c.codigo
+) d, infantario as i, cliente as c
+WHERE d.distancia = ST_Distance(c.ponto, i.ponto) AND d.codigo = c.codigo
+;
+
+
+--=========================================
+-- Quais os infantários de cada freguesia ?
+--=========================================
+-- Atencao: a vista deve projectar o atributo "oid" ou uma chave primária
+--          do tipo "integer" de modo a ser apresentada no QGis
+--=======================================================================
+
+DROP VIEW v_inf_frg;
+
+
+CREATE VIEW v_inf_frg( oid, nome_infantario, nome_freguesia_residencia, nome_freguesia_infantario, g_local_cliente )
+AS
+SELECT ...
+;
+
+
+SELECT nome_infantario, nome_freguesia_residencia, nome_freguesia_infantario, ST_AsText( g_local_cliente )
+FROM v_inf_frg
+;
+

@@ -1,0 +1,1 @@
+_go 07_script_CRIAR_OBJETO_MOVEL.txt
