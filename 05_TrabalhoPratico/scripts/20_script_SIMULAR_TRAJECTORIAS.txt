@@ -82,16 +82,19 @@ WHERE id = 2;
 
 
 
-
-
 INSERT INTO cinematica_hist
 SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
 FROM cinematica;
 
 
 UPDATE cinematica
-SET velocidade = novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 3 )
-FROM cinematica c, objecto_movel o, efeito_obj e, terrenos_rios t, (
+SET velocidade = 
+CASE
+    WHEN norma((novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 3 )).linear) > l.norma_max
+	THEN c.velocidade
+    ELSE novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 3 )
+END
+FROM cinematica c, objecto_movel o, efeito_obj e, terrenos_rios t, limites l, (
 	SELECT c.id as id, max(t.nivel) as nivel
 	FROM cinematica c, terrenos_rios t
 	WHERE ST_Within(c.g_posicao, t.g_geo)
@@ -104,6 +107,7 @@ WHERE
 	ST_Within(c.g_posicao, t.g_geo) AND
 	t.id_tipo_terreno = e.id_tipo_terreno AND
 	n.nivel = t.nivel AND
+	l.id_limite = 'vel' AND
 	cinematica.id = c.id
 ;
 

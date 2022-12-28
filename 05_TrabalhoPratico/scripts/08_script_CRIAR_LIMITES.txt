@@ -12,11 +12,11 @@
 
 
 
-DROP TABLE IF EXISTS limits;
+DROP TABLE IF EXISTS limites;
 
-CREATE TABLE limits (
-	id_limit varchar primary key,
-	norma_value real
+CREATE TABLE limites (
+	id_limite varchar primary key,
+	norma_max real
 );
 
 

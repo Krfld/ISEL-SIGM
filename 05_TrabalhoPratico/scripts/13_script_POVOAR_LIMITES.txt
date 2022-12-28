@@ -12,10 +12,10 @@
 
 
 
-DELETE FROM limits;
+DELETE FROM limites;
 
 
-INSERT INTO limits ( id_limit, norma_value )
+INSERT INTO limites ( id_limite, norma_max )
 VALUES
 ('vel',	3),
 ('acel', 3)
