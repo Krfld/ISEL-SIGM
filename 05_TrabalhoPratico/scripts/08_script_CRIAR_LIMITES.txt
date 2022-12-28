@@ -1,0 +1,24 @@
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_ta
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+DROP TABLE IF EXISTS limits;
+
+CREATE TABLE limits (
+	id_limit varchar primary key,
+	norma_value real
+);
+
+
+
+

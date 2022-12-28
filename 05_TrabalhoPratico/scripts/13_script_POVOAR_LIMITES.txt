@@ -1,0 +1,22 @@
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_ta
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+DELETE FROM limits;
+
+
+INSERT INTO limits ( id_limit, norma_value )
+VALUES
+('vel',	3),
+('acel', 3)
+;

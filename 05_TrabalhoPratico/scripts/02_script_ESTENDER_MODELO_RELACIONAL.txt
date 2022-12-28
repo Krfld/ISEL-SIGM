@@ -134,6 +134,17 @@ commutator = +
 );
 
 
+CREATE OR REPLACE FUNCTION norma( vec t_vector )
+RETURNS real
+AS $$
+DECLARE
+BEGIN
+	RETURN sqrt(power(vec.x, 2) + power(vec.y, 2));
+END;
+$$ LANGUAGE plpgsql;
+
+
+
 --__________________
 -- Normalizar vector
 --__________________
@@ -143,13 +154,11 @@ CREATE OR REPLACE FUNCTION normalizar( vec t_vector )
 RETURNS t_vector
 AS $$
 DECLARE
-    norma real;
     new_x real;
     new_y real;
 BEGIN
-	norma := sqrt(power(vec.x, 2) + power(vec.y, 2));
-	new_x := vec.x / norma;
-	new_y := vec.y / norma;
+	new_x := vec.x / norma(vec);
+	new_y := vec.y / norma(vec);
     RETURN (new_x, new_y);
 END;
 $$ LANGUAGE plpgsql;

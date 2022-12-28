@@ -37,3 +37,7 @@ CREATE TABLE efeito_obj (
 	constraint fk_id_objeto foreign key (id_objeto) references objecto_movel(id),
 	constraint fk_id_tipo_terreno foreign key (id_tipo_terreno) references tipo_terreno(id_tipo_terreno)
 );
+
+
+
+
