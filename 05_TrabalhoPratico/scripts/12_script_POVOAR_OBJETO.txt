@@ -21,6 +21,12 @@ VALUES
 ;
 
 
+UPDATE objecto_movel
+SET g_geo = ST_Translate(o.g_geo, ST_X(c.g_posicao) - ST_X(ST_Centroid(o.g_geo)), ST_Y(c.g_posicao) - ST_Y(ST_Centroid(o.g_geo)))
+FROM objecto_movel o, cinematica c
+WHERE o.id = c.id AND objecto_movel.id = o.id
+;
+
 
 
 
