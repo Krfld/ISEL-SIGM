@@ -134,6 +134,7 @@ commutator = +
 );
 
 
+
 CREATE OR REPLACE FUNCTION norma( vec t_vector )
 RETURNS real
 AS $$

@@ -11,89 +11,15 @@
 --==========================
 
 
------------------------------
------------------------------
--- Simulacao de trajectorias:
--- [1] Iniciacao dos dados
------------------------------
------------------------------
-DELETE FROM cinematica_hist;
-
-
 
 /*
---------------------------------------------
---------------------------------------------
--- Simulacao de trajectorias:
--- [2] Executar as linhas (A) e (B) em ciclo
---------------------------------------------
---------------------------------------------
--- (A)
-INSERT INTO cinematica_hist
-SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
-FROM cinematica;
-
-
--- (B)
-UPDATE cinematica
-SET velocidade = novo_velocidade( velocidade, aceleracao, 3 );
-
-UPDATE cinematica
-SET g_posicao = novo_posicao( g_posicao, velocidade, 3 );
-
-UPDATE cinematica
-SET orientacao = novo_orientacao( orientacao, velocidade, 3 );
---________________________________________________________________________________________________
-
-
-
--- ==========================
--- Separar os dois movimentos
--- ==========================
-DROP VIEW IF EXISTS v_trajectoria_1;
-CREATE VIEW v_trajectoria_1 AS
-SELECT *
-FROM cinematica_hist
-WHERE id = 1;
-
-DROP VIEW IF EXISTS v_trajectoria_2;
-CREATE VIEW v_trajectoria_2 AS
-SELECT *
-FROM cinematica_hist
-WHERE id = 2;
-
-
--- ========================================
--- Separar as duas estruturas de cinematica
--- ========================================
-DROP VIEW IF EXISTS v_cinematica_1;
-CREATE VIEW v_cinematica_1 AS
-SELECT *
-FROM cinematica
-WHERE id = 1;
-
-DROP VIEW IF EXISTS v_cinematica_2;
-CREATE VIEW v_cinematica_2 AS
-SELECT *
-FROM cinematica
-WHERE id = 2;
-*/
-
-
-
-
-INSERT INTO cinematica_hist
-SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
-FROM cinematica;
-
-
 UPDATE cinematica
 SET velocidade = 
-CASE
-    WHEN norma((novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )).linear) > l.norma_max
-	THEN c.velocidade
-    ELSE novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )
-END
+	CASE
+		WHEN norma((novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )).linear) > l.norma_max
+		THEN c.velocidade
+		ELSE novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )
+	END
 FROM cinematica c, objecto_movel o, efeito_obj e, terrenos_rios t, limites l, (
 	SELECT c.id as id, max(t.nivel) as nivel
 	FROM cinematica c, terrenos_rios t
@@ -109,6 +35,28 @@ WHERE
 	n.nivel = t.nivel AND
 	l.id_limite = 'vel' AND
 	cinematica.id = c.id
+;
+*/
+
+
+
+INSERT INTO cinematica_hist
+SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
+FROM cinematica;
+
+
+UPDATE cinematica
+SET velocidade =
+	CASE
+		WHEN norma((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) > l.norma_max
+		THEN (
+			normalizar((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) * l.norma_max,
+			(novo_velocidade( c.velocidade, c.aceleracao, 1 )).angular
+		)::t_velocidade
+		ELSE novo_velocidade( c.velocidade, c.aceleracao, 1 )
+	END
+FROM cinematica c, limites l
+WHERE l.id_limite = 'vel' AND cinematica.id = c.id
 ;
 
 
@@ -140,4 +88,40 @@ SET g_geo = ST_Translate(o.g_geo, ST_X(c.g_posicao) - ST_X(ST_Centroid(o.g_geo))
 FROM objecto_movel o, cinematica c
 WHERE o.id = c.id AND objecto_movel.id = o.id
 ;
+
+
+
+
+/*
+-- ==========================
+-- Separar os dois movimentos
+-- ==========================
+DROP VIEW IF EXISTS v_trajectoria_1;
+CREATE VIEW v_trajectoria_1 AS
+SELECT *
+FROM cinematica_hist
+WHERE id = 1;
+
+DROP VIEW IF EXISTS v_trajectoria_2;
+CREATE VIEW v_trajectoria_2 AS
+SELECT *
+FROM cinematica_hist
+WHERE id = 2;
+
+
+-- ========================================
+-- Separar as duas estruturas de cinematica
+-- ========================================
+DROP VIEW IF EXISTS v_cinematica_1;
+CREATE VIEW v_cinematica_1 AS
+SELECT *
+FROM cinematica
+WHERE id = 1;
+
+DROP VIEW IF EXISTS v_cinematica_2;
+CREATE VIEW v_cinematica_2 AS
+SELECT *
+FROM cinematica
+WHERE id = 2;
+*/
 

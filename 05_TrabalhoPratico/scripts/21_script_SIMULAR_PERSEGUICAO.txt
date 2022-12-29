@@ -12,80 +12,61 @@
 
 
 
-----------------------------
-----------------------------
--- Simulacao de perseguicao:
--- [1] Iniciacao dos dados
-----------------------------
-----------------------------
--- no caso de ja ter construido objecto_movel sera' preciso fazer:
-DELETE FROM objecto_movel;
-DELETE FROM pp;
-DELETE FROM cinematica_hist;
-DELETE FROM cinematica;
-
---_________________________________________________________________________________________
--- Inserir dados para caracterizacao da cinematica
--- ATENCAO: o velocidade esta normalizada portanto a aceleraao também deve estar em [-1, 1]
---_________________________________________________________________________________________
-INSERT INTO cinematica( id, g_posicao, orientacao, velocidade, aceleracao ) VALUES(
-1,
-ST_GeomFromText( 'POINT( 10 7.5 )', 3763 ),
-0.0,
-ROW( ROW( 1, 1 ), 1.3 ),
-ROW( ROW( 0.3, -0.1 ), 1.0 )
-);
-
-INSERT INTO cinematica( id, g_posicao, orientacao, velocidade, aceleracao ) VALUES(
-2,
-ST_GeomFromText( 'POINT( 1 2 )', 3763 ),
-0.0,
-ROW( ROW( 0.5, 0.5 ), 0.3 ),
-ROW( ROW( 0.2, 0.5 ), 1.0 )
-);
-
-
--- Inserir dados para caracterizacao da perseguicao
---_________________________________________________
-INSERT INTO pp( id_perseguidor, id_alvo )
-VALUES( 1, 2 );
-
-
-
---------------------------------------------
---------------------------------------------
--- Simulacao de perseguicao:
--- [2] Executar as linhas (A) e (B) em ciclo
--- (e.g., OBJECTo com id=1 atras de id=2 
---  com velocidade-de-perseguicao=0.2)
---------------------------------------------
---------------------------------------------
--- (A)
 INSERT INTO cinematica_hist
 SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
 FROM cinematica;
 
--- (B)
+
 UPDATE cinematica
 SET aceleracao = obter_aceleracao_perseguidor( pp.id_perseguidor, pp.id_alvo, 1 )
 FROM pp
-WHERE id = pp.id_perseguidor;;
+WHERE id = pp.id_perseguidor
+;
+
 
 UPDATE cinematica
-SET velocidade = novo_velocidade( velocidade, aceleracao, 1 )
-FROM pp
-WHERE id = pp.id_perseguidor;
+SET velocidade =
+	CASE
+		WHEN norma((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) > l.norma_max
+		THEN (
+			normalizar((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) * l.norma_max,
+			(novo_velocidade( c.velocidade, c.aceleracao, 1 )).angular
+		)::t_velocidade
+		ELSE novo_velocidade( c.velocidade, c.aceleracao, 1 )
+	END
+FROM cinematica c, limites l
+WHERE l.id_limite = 'vel' AND cinematica.id = c.id
+;
+
 
 UPDATE cinematica
-SET g_posicao = novo_posicao( g_posicao, velocidade, 1 )
-FROM pp
-WHERE id = pp.id_perseguidor;
+SET g_posicao = novo_posicao( c.g_posicao, ((c.velocidade).linear * e.efeito, (c.velocidade).angular), 1 )
+FROM cinematica c, objecto_movel o, efeito_obj e, terrenos_rios t, (
+	SELECT c.id as id, max(t.nivel) as nivel
+	FROM cinematica c, terrenos_rios t
+	WHERE ST_Within(c.g_posicao, t.g_geo)
+	GROUP BY c.id
+) as n
+WHERE
+	n.id = c.id AND
+	c.id = o.id_cinematica AND
+	o.id = e.id_objeto AND
+	ST_Within(c.g_posicao, t.g_geo) AND	
+	t.id_tipo_terreno = e.id_tipo_terreno AND
+	n.nivel = t.nivel AND
+	cinematica.id = c.id
+;
+
 
 UPDATE cinematica
-SET orientacao = novo_orientacao( orientacao, velocidade, 1 )
-FROM pp
-WHERE id = pp.id_perseguidor;
---________________________________________________________________________________________________
+SET orientacao = novo_orientacao( orientacao, velocidade, 1 );
+
+
+UPDATE objecto_movel
+SET g_geo = ST_Translate(o.g_geo, ST_X(c.g_posicao) - ST_X(ST_Centroid(o.g_geo)), ST_Y(c.g_posicao) - ST_Y(ST_Centroid(o.g_geo)))
+FROM objecto_movel o, cinematica c
+WHERE o.id = c.id AND objecto_movel.id = o.id
+;
 
 
 
