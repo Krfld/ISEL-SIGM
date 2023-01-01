@@ -12,31 +12,6 @@
 
 
 
-/*
-UPDATE cinematica
-SET velocidade = 
-	CASE
-		WHEN norma((novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )).linear) > l.norma_max
-		THEN c.velocidade
-		ELSE novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )
-	END
-FROM cinematica c, objecto_movel o, efeito_obj e, terrenos_rios t, limites l, (
-	SELECT c.id as id, max(t.nivel) as nivel
-	FROM cinematica c, terrenos_rios t
-	WHERE ST_Within(c.g_posicao, t.g_geo)
-	GROUP BY c.id
-) as n
-WHERE
-	n.id = c.id AND
-	c.id = o.id_cinematica AND
-	o.id = e.id_objeto AND
-	ST_Within(c.g_posicao, t.g_geo) AND
-	t.id_tipo_terreno = e.id_tipo_terreno AND
-	n.nivel = t.nivel AND
-	l.id_limite = 'vel' AND
-	cinematica.id = c.id
-;
-*/
 
 do $$
 begin
@@ -94,40 +69,4 @@ begin
 	end loop;
 end; $$
 
-
-
-
-
-/*
--- ==========================
--- Separar os dois movimentos
--- ==========================
-DROP VIEW IF EXISTS v_trajectoria_1;
-CREATE VIEW v_trajectoria_1 AS
-SELECT *
-FROM cinematica_hist
-WHERE id = 1;
-
-DROP VIEW IF EXISTS v_trajectoria_2;
-CREATE VIEW v_trajectoria_2 AS
-SELECT *
-FROM cinematica_hist
-WHERE id = 2;
-
-
--- ========================================
--- Separar as duas estruturas de cinematica
--- ========================================
-DROP VIEW IF EXISTS v_cinematica_1;
-CREATE VIEW v_cinematica_1 AS
-SELECT *
-FROM cinematica
-WHERE id = 1;
-
-DROP VIEW IF EXISTS v_cinematica_2;
-CREATE VIEW v_cinematica_2 AS
-SELECT *
-FROM cinematica
-WHERE id = 2;
-*/
 

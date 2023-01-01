@@ -23,14 +23,16 @@ CREATE TABLE objecto_movel(
 	id int primary key,
 	nome varchar,
 	id_cinematica int,
-	norma_vel_max real,
-	boost real,
+	norma_vel_max real, --velocidade max para o objeto
+	boost real, --arranque (aceleracao) do objeto
 	constraint fk1 FOREIGN KEY (id_cinematica) references cinematica(id)
 );
 SELECT AddGeometryColumn( '', 'objecto_movel', 'g_geo', 0, 'POLYGON', 2 );
 --==========================================================================
 
 
+
+-- efeito sobre o qual o terreno vai ter sobre o objeto
 CREATE TABLE efeito_obj (
 	id_objeto int,
 	id_tipo_terreno varchar,

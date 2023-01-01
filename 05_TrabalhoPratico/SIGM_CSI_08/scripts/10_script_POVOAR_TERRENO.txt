@@ -74,7 +74,7 @@ VALUES
 ;
 
 
-
+-- tabela para guardar todos os terrenos e rios num mesmo local, juntando o buffer dos rios com os poligonos dos terrenos
 
 DROP TABLE IF EXISTS terrenos_rios;
 
