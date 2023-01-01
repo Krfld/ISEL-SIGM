@@ -17,6 +17,5 @@ DELETE FROM limites;
 
 INSERT INTO limites ( id_limite, norma_max )
 VALUES
-('vel',	10),
-('acel', 10)
+('vel',	10)
 ;
