@@ -1,1 +1,1 @@
-sql loop
+max vel e acel fixa

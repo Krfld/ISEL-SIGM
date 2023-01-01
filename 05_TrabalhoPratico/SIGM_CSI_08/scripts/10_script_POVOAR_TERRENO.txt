@@ -76,9 +76,6 @@ VALUES
 
 
 
-
-
-
 DROP TABLE IF EXISTS terrenos_rios;
 
 CREATE TABLE terrenos_rios (
@@ -87,6 +84,10 @@ CREATE TABLE terrenos_rios (
 	constraint fk_id_tipo_terreno foreign key (id_tipo_terreno) references tipo_terreno(id_tipo_terreno)
 );
 SELECT AddGeometryColumn( '', 'terrenos_rios', 'g_geo', 0, 'POLYGON', 2 );
+
+
+
+
 
 INSERT INTO terrenos_rios ( id_tipo_terreno, nivel, g_geo )
 SELECT t.id_tipo_terreno, t.nivel, t.g_terreno as g_geo

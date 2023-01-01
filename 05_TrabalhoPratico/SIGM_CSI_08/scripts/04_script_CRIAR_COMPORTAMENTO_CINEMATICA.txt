@@ -17,7 +17,6 @@
 -- Obter valores de 'cinematica' para um instante do tempo
 ----------------------------------------------------------
 ----------------------------------------------------------
-DROP VIEW IF EXISTS v_novo_cinematica;
 DROP FUNCTION IF EXISTS novo_posicao( geometry, t_velocidade, real );
 DROP FUNCTION IF EXISTS novo_orientacao( real, t_velocidade, real );
 DROP FUNCTION IF EXISTS novo_velocidade( t_velocidade, t_aceleracao, real );
@@ -74,26 +73,4 @@ BEGIN
     RETURN novo_velocidade;
 END;
 $$ LANGUAGE plpgsql;
-
-
-/*
---------------------------------------------------------------
---------------------------------------------------------------
--- Vista da 'cinematica' para um instante do tempo (e.g., 2)
---------------------------------------------------------------
---------------------------------------------------------------
-DROP VIEW IF EXISTS v_novo_cinematica;
-CREATE VIEW v_novo_cinematica AS
-SELECT c.id AS id,
-       novo_orientacao( c.orientacao, c.velocidade, 2 ) AS orientacao,
-       novo_velocidade( c.velocidade, c.aceleracao, 2 ) AS velocidade,
-       c.aceleracao,
-       ST_AsText( novo_posicao( c.g_posicao, c.velocidade, 2 ) ) AS posicao_texto,
-       novo_posicao( c.g_posicao, c.velocidade, 2 ) AS posicao
-FROM cinematica c;
-
-SELECT * FROM v_novo_cinematica;
--- resolucao: confrontar com os dados obtidos isoladamente por cada funcao (acima)
---=================================================================================
-*/
 
