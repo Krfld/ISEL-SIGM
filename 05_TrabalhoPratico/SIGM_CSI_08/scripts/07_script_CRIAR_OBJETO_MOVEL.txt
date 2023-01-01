@@ -23,6 +23,8 @@ CREATE TABLE objecto_movel(
 	id int primary key,
 	nome varchar,
 	id_cinematica int,
+	norma_vel_max real,
+	boost real,
 	constraint fk1 FOREIGN KEY (id_cinematica) references cinematica(id)
 );
 SELECT AddGeometryColumn( '', 'objecto_movel', 'g_geo', 0, 'POLYGON', 2 );

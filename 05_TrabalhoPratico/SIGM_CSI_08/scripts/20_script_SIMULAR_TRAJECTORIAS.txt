@@ -50,15 +50,15 @@ begin
 		UPDATE cinematica
 		SET velocidade =
 			CASE
-				WHEN norma((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) > l.norma_max
+				WHEN norma((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) > o.norma_vel_max
 				THEN (
-					normalizar((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) * l.norma_max,
+					normalizar((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) * o.norma_vel_max,
 					(novo_velocidade( c.velocidade, c.aceleracao, 1 )).angular
 				)::t_velocidade
 				ELSE novo_velocidade( c.velocidade, c.aceleracao, 1 )
 			END
-		FROM cinematica c, limites l
-		WHERE l.id_limite = 'vel' AND cinematica.id = c.id
+		FROM cinematica c, objecto_movel o
+		WHERE o.id_cinematica = c.id AND cinematica.id = c.id
 		;
 
 
