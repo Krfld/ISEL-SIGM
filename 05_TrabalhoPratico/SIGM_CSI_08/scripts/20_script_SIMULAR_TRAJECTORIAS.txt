@@ -24,21 +24,17 @@ begin
 
 		UPDATE cinematica
 		SET velocidade =
-			CASE
-				WHEN norma((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) > o.norma_vel_max
-				THEN (
-					normalizar((novo_velocidade( c.velocidade, c.aceleracao, 1 )).linear) * o.norma_vel_max,
-					(novo_velocidade( c.velocidade, c.aceleracao, 1 )).angular
-				)::t_velocidade
-				ELSE novo_velocidade( c.velocidade, c.aceleracao, 1 )
+		CASE WHEN norma((c.velocidade).linear) > o.norma_vel_max * e.efeito
+		THEN novo_velocidade( c.velocidade, ((normalizar((c.velocidade).linear) * -1) * o.boost * (1 - e.efeito)::real, (c.aceleracao).angular), 1 )
+		ELSE
+			CASE WHEN norma((novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )).linear) > o.norma_vel_max * e.efeito
+			THEN (
+				normalizar((novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )).linear) * o.norma_vel_max * e.efeito * 0.9,
+				(novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )).angular
+			)::t_velocidade
+			ELSE novo_velocidade( c.velocidade, ((c.aceleracao).linear * e.efeito, (c.aceleracao).angular), 1 )
 			END
-		FROM cinematica c, objecto_movel o
-		WHERE o.id_cinematica = c.id AND cinematica.id = c.id
-		;
-
-
-		UPDATE cinematica
-		SET g_posicao = novo_posicao( c.g_posicao, ((c.velocidade).linear * e.efeito, (c.velocidade).angular), 1 )
+		END
 		FROM cinematica c, objecto_movel o, efeito_obj e, terrenos_rios t, (
 			SELECT c.id as id, max(t.nivel) as nivel
 			FROM cinematica c, terrenos_rios t
@@ -54,6 +50,10 @@ begin
 			n.nivel = t.nivel AND
 			cinematica.id = c.id
 		;
+
+
+		UPDATE cinematica
+		SET g_posicao = novo_posicao( g_posicao, velocidade, 1 );
 
 
 		UPDATE cinematica
